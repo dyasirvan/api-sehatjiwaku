@@ -35,6 +35,9 @@ $routes->setAutoRoute(true);
 // $routes->get('/', 'Home::index');
 $routes->resource('login');
 $routes->resource('register');
+$routes->resource('penyakit');
+$routes->resource('gejala');
+$routes->resource('dokter');
 
 /*
  * --------------------------------------------------------------------

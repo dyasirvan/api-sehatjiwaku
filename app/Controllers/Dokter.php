@@ -78,7 +78,7 @@ class Dokter extends ResourceController
         $model->update($id, $data);
         $response = [
             'status'   => $this->response->getStatusCode(),
-            'messages' => 'Data di-update'
+            'message' => 'Data di-update'
         ];
         return $this->respond($response);
     }
@@ -88,7 +88,7 @@ class Dokter extends ResourceController
         $model->delete($id);
         $response = [
             'status'   => $this->response->getStatusCode(),
-            'messages' => 'Data dihapus'
+            'message' => 'Data dihapus'
         ];
         return $this->respond($response);
     }

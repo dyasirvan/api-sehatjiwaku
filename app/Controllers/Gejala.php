@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\GejalaModel;
+use App\Models\GejalaPenyakitModel;
 use CodeIgniter\API\ResponseTrait;
 use CodeIgniter\RESTful\ResourceController;
 use Exception;
@@ -15,14 +16,14 @@ class Gejala extends ResourceController
     {
         $model = new GejalaModel();
         $data = $model->findAll();
-        if($data != null){
+        if ($data != null) {
             $response = [
                 'status' => $this->response->getStatusCode(),
                 'message' => 'Data ditemukan',
                 'data' => $data
             ];
             return $this->respond($response);
-        }else{
+        } else {
             $response = [
                 'status' => $this->response->getStatusCode(),
                 'message' => 'Data masih kosong',
@@ -35,19 +36,27 @@ class Gejala extends ResourceController
     public function create()
     {
         $model = new GejalaModel();
+        $modelGejalaPenyakit = new GejalaPenyakitModel();
         $data = [
             'nama_gejala' => $this->request->getVar('nama_gejala'),
             'id_penyakit' => $this->request->getVar('id_penyakit')
         ];
         $data = json_decode(file_get_contents("php://input"));
-        
-        $model->insert($data);
-    
+
+        $dataGejala['nama_gejala'] = $data->nama_gejala;
+        $model->insert($dataGejala);
+
+        $dataGejalaPenyakit = [
+            'id_penyakit' => $data->id_penyakit,
+            'id_gejala' => $model->getInsertID()
+        ];
+        $modelGejalaPenyakit->insert($dataGejalaPenyakit);
+
         $response = [
             'status' => $this->response->getStatusCode(),
             'message' => 'Data disimpan'
         ];
-        return $this->respond($response);        
+        return $this->respond($response);
     }
 
     public function update($id = null)
@@ -56,18 +65,17 @@ class Gejala extends ResourceController
         $json = $this->request->getJSON();
         if ($json) {
             $data = [
-                'id_penyakit' => $json->id_penyakit,
                 'nama_gejala' => $json->nama_gejala
             ];
         } else {
             $input = $this->request->getRawInput();
             $data = [
-                'id_penyakit' => $input['id_penyakit'],
                 'nama_gejala' => $input['nama_gejala'],
             ];
         }
         // Insert to Database
         $model->update($id, $data);
+
         $response = [
             'status'   => $this->response->getStatusCode(),
             'message' => 'Data di-update'
@@ -75,9 +83,14 @@ class Gejala extends ResourceController
         return $this->respond($response);
     }
 
-    public function delete($id = null){
+    public function delete($id = null)
+    {
         $model = new GejalaModel();
+        $modelGejalaPenyakit = new GejalaPenyakitModel();
+
+        $modelGejalaPenyakit->deleteGejalaPenyakit($id);
         $model->delete($id);
+
         $response = [
             'status'   => $this->response->getStatusCode(),
             'message' => 'Data dihapus'
